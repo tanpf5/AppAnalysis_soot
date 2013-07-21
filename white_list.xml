@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<whitelist>
+<item>onClick</item>
+<item>onLongClick</item>
+<item>onMenuItemSelected</item>
+<item>onContextItemSelected</item>
+<item>onItemClick</item>
+<item>onItemLongClick</item>
+<item>onItemSelected</item>
+<item>onListItemClick</item>
+</whitelist>
