@@ -77,9 +77,11 @@ public class TestSoot {
 		} catch (Exception e) {
 			throw new ReleaseException();
 		}
-
-
-		return new String[0];
+		String[] result = new String [31];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = String.valueOf(0);
+		}
+		return result;
 	}
 
 
