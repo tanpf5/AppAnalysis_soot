@@ -229,5 +229,72 @@ public class TestSoot {
 		dangerousBehaviors.add(dangerousBehavior);
 	}
 
+	// 通过白名单匹配方式对风险行为进行判别
+	private void checkDangerousBehavior() {
 
+		int bodylistSize = bodyList.size();
+		for (int bodyIndex = 0; bodyIndex < bodylistSize; bodyIndex++) {
+			// Body循环
+			Body b = bodyList.get(bodyIndex);
+			UnitGraph graph = new ExceptionalUnitGraph(b);
+			Iterator<Unit> gIt = graph.iterator();
+			while (gIt.hasNext()) {
+				// Body内语句循环
+				Unit u = gIt.next();
+				String unitString = u.toString();
+				checkDangerousBehaviorByUnit(b, unitString);
+			}
+		}
+
+		handleCheckResult();
+	}
+
+
+	private void checkDangerousBehaviorByUnit(Body b, String unitString) {
+
+		int dangerSize = dangerousBehaviors.size();
+		for (int dangerIndex = 0; dangerIndex < dangerSize; dangerIndex++) {
+
+			// 每个语句--风险行为循环
+			DangerousBehavior dangerousBehavior = dangerousBehaviors
+					.get(dangerIndex);
+			List<MethodEntity> curMethods = dangerousBehavior.getCurMethods();
+			List<MethodEntity> nextMethods = dangerousBehavior.getNextMethods();
+
+			int methodsSize = curMethods.size();
+			for (int methodIndex = 0; methodIndex < methodsSize; methodIndex++) {
+				MethodEntity method = curMethods.get(methodIndex);
+
+				if (unitString.contains(method.getClassName())
+						&& unitString.contains(method.getMethodName())) {
+					// 发现匹配项
+					method.setMethodCalledByNull(false);
+					String curMethod = b.getMethod().getName();
+
+					int whiteListSize = whiteList.size();
+					for (int whiteIndex = 0; whiteIndex < whiteListSize; whiteIndex++) {
+						// 对匹配项进行白名单循环
+						WhitelistItem whiteItem = whiteList.get(whiteIndex);
+						String whiteItemMethod = whiteItem.getMethodName();
+						if (curMethod.equals(whiteItemMethod)) {
+							method.setMethodCalledByWhite(true);
+						}
+					}
+					// 如果匹配项不在白名单中，则加入nextMethods中
+					if (!method.isMethodCalledByWhite()) {
+						MethodEntity nextMethod = new MethodEntity();
+						nextMethod.setClassName(b.getMethod()
+								.getDeclaringClass().getName());
+						nextMethod.setMethodName(b.getMethod().getName());
+						nextMethods.add(nextMethod);
+					}
+					curMethods.set(methodIndex, method);
+				}
+			}
+			dangerousBehavior.setNextMethods(nextMethods);
+		}
+	}
+	private void handleCheckResult() {
+		
+	}
 }
