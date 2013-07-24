@@ -24,8 +24,8 @@ import soot.Transform;
 import soot.Unit;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.UnitGraph;
-
 import util.DangerousBehavior;
+import util.MaliceBehavior;
 import util.MethodEntity;
 import util.ReleaseException;
 import util.SecureRule;
@@ -41,6 +41,9 @@ public class TestSoot {
 
 	// 风险行为集合
 	private List<DangerousBehavior> dangerousBehaviors = new ArrayList<DangerousBehavior>();
+	
+	// 恶意行为集合
+	private List<MaliceBehavior> maliceBehaviors = new ArrayList<MaliceBehavior>();
 
 
 	private List<Body> bodyList = new ArrayList<Body>();
@@ -77,9 +80,20 @@ public class TestSoot {
 		} catch (Exception e) {
 			throw new ReleaseException();
 		}
+		
+		// 二次分析，从风险行为中筛选出恶意行为
+		int i = 1;
+		while (!dangerousBehaviors.isEmpty()) {
+			System.out
+					.println("**********************二次分析**************************"
+							+ i);
+			checkDangerousBehavior();
+			i++;
+		}
+
 		String[] result = new String [31];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = String.valueOf(0);
+		for (int i1 = 0; i1 < result.length; i1++) {
+			result[i1] = String.valueOf(0);
 		}
 		return result;
 	}
@@ -295,6 +309,98 @@ public class TestSoot {
 		}
 	}
 	private void handleCheckResult() {
-		
+
+		exit: for (int dangerIndex = 0; dangerIndex < dangerousBehaviors.size(); dangerIndex++) {
+			if (dangerIndex < 0) {
+				break;
+			}
+			DangerousBehavior dangerousBehavior = dangerousBehaviors
+					.get(dangerIndex);
+			List<MethodEntity> curMethods = dangerousBehavior.getCurMethods();
+			List<MethodEntity> nextMethods = dangerousBehavior.getNextMethods();
+
+			if (nextMethods.isEmpty()) {
+
+				boolean hasCall = false;
+				int methodsSize = curMethods.size();
+				for (int methodIndex = 0; methodIndex < methodsSize; methodIndex++) {
+					MethodEntity method = curMethods.get(methodIndex);
+
+					if (method.isMethodCalledByWhite()) {
+						hasCall = true;
+					}
+				}
+				if (hasCall) {
+					System.out.println("----"
+							+ dangerousBehavior.getInitMethod().getMethodName()
+							+ "-----只有白名单调用，循环停止------------");
+				} else {
+					System.out.println("----"
+							+ dangerousBehavior.getInitMethod().getMethodName()
+							+ "-----无调用，循环停止------------");
+					changeToMaliceBehavior(dangerousBehavior);
+				}
+				dangerousBehaviors.remove(dangerIndex);
+				dangerIndex--;
+				continue exit;
+			}
+
+			int methodsSize = curMethods.size();
+			for (int methodIndex = 0; methodIndex < methodsSize; methodIndex++) {
+				MethodEntity method = curMethods.get(methodIndex);
+				if (method.isMethodCalledByNull()) {
+
+					// 遍历完毕，没有匹配项，判断为恶意行为
+					changeToMaliceBehavior(dangerousBehavior);
+					dangerousBehaviors.remove(dangerIndex);
+					dangerIndex--;
+					System.out.println("-----"
+							+ dangerousBehavior.getInitMethod().getMethodName()
+							+ "----再无调用，判断为恶意行为------------");
+					continue exit;
+				}
+			}
+
+			dangerousBehavior.setCurMethods(nextMethods);
+			dangerousBehavior.setNextMethods(new ArrayList<MethodEntity>());
+
+			System.out.println("-----"
+					+ dangerousBehavior.getInitMethod().getMethodName()
+					+ "----仍有调用，循环继续------------");
+			dangerousBehaviors.set(dangerIndex, dangerousBehavior);
+
+		}
+	}
+
+	// 风险行为转化为恶意行为
+	private void changeToMaliceBehavior(DangerousBehavior dangerousBehavior) {
+
+		MaliceBehavior maliceBehavior = new MaliceBehavior();
+
+		maliceBehavior.setClassName(dangerousBehavior.getInitMethod()
+				.getClassName());
+		maliceBehavior.setMethodName(dangerousBehavior.getInitMethod()
+				.getMethodName());
+		maliceBehavior.setMaliceDiscribeString(dangerousBehavior
+				.getDiscribeString());
+		maliceBehavior.setMaliceApi(dangerousBehavior.getApi());
+
+		maliceBehaviors.add(maliceBehavior);
+	}
+
+	// 输出分析结果
+	private void outputResult() {
+
+		if (!maliceBehaviors.isEmpty()) {
+			int size = maliceBehaviors.size();
+			System.out.println("发现 " + size + " 个恶意行为 ！详细信息如下：");
+
+			for (int i = 0; i < size; i++) {
+				MaliceBehavior maliceBehavior = maliceBehaviors.get(i);
+				System.out.println(maliceBehavior.getString());
+			}
+		} else {
+			System.out.println("没有发现恶意行为！");
+		}
 	}
 }
