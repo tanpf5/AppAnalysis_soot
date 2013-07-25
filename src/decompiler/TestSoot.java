@@ -91,13 +91,93 @@ public class TestSoot {
 			i++;
 		}
 
-		String[] result = new String [31];
-		for (int i1 = 0; i1 < result.length; i1++) {
-			result[i1] = String.valueOf(0);
+		// 输出分析结果
+		outputResult();
+		return getResult();
+	}
+
+	private String[] getResult() {
+		String[] result = new String[31];
+		int[] count = new int[31];
+		if (!maliceBehaviors.isEmpty()) {
+			int size = maliceBehaviors.size();
+			for (int i = 0; i < size; i++) {
+				MaliceBehavior maliceBehavior = maliceBehaviors.get(i);
+				if (maliceBehavior.getString().contains("发送短信")) {
+					count[0] = count[0] + 1;
+				} else if (maliceBehavior.getString().contains("发送多人短信")) {
+					count[1] = count[1] + 1;
+				} else if (maliceBehavior.getString().contains("连接网络")) {
+					count[2] = count[2] + 1;
+				} else if (maliceBehavior.getString().contains("获取电话状态")) {
+					count[3] = count[3] + 1;
+				} else if (maliceBehavior.getString().contains("获取手机位置")) {
+					count[4] = count[4] + 1;
+				} else if (maliceBehavior.getString().contains("获取唯一的设备ID")) {
+					count[5] = count[5] + 1;
+				} else if (maliceBehavior.getString().contains("获取设备的软件版本号")) {
+					count[6] = count[6] + 1;
+				} else if (maliceBehavior.getString().contains("获取手机号")) {
+					count[7] = count[7] + 1;
+				} else if (maliceBehavior.getString().contains("获取附近的电话的信息")) {
+					count[8] = count[8] + 1;
+				} else if (maliceBehavior.getString().contains("获取ISO标准的国家码")) {
+					count[9] = count[9] + 1;
+				} else if (maliceBehavior.getString()
+						.contains("获取MCC+MNC(SIM)")) {
+					count[15] = count[15] + 1;
+				} else if (maliceBehavior.getString().contains("获取当前已注册的用户的名字")) {
+					count[11] = count[11] + 1;
+				} else if (maliceBehavior.getString().contains("获取当前的网络类型")) {
+					count[12] = count[12] + 1;
+				} else if (maliceBehavior.getString().contains("获取手机类型")) {
+					count[13] = count[13] + 1;
+				} else if (maliceBehavior.getString().contains("获取IＳＯ国家码")) {
+					count[14] = count[14] + 1;
+				} else if (maliceBehavior.getString().contains("获取MCC+MNC")) {
+					count[10] = count[10] + 1;
+				} else if (maliceBehavior.getString().contains("获取服务商名称")) {
+					count[16] = count[16] + 1;
+				} else if (maliceBehavior.getString().contains("获取SIM卡的序列号")) {
+					count[17] = count[17] + 1;
+				} else if (maliceBehavior.getString().contains("获取SIM的状态信息")) {
+					count[18] = count[18] + 1;
+				} else if (maliceBehavior.getString().contains("获取唯一的用户ID")) {
+					count[19] = count[19] + 1;
+				} else if (maliceBehavior.getString().contains("获取语音邮件的标签")) {
+					count[20] = count[20] + 1;
+				} else if (maliceBehavior.getString().contains("获取语音邮件号码")) {
+					count[21] = count[21] + 1;
+				} else if (maliceBehavior.getString().contains("获取用户位置信息")) {
+					count[22] = count[22] + 1;
+				} else if (maliceBehavior.getString().contains("读取设备通讯录")) {
+					count[23] = count[23] + 1;
+				} else if (maliceBehavior.getString().contains("读取通话记录")) {
+					count[24] = count[24] + 1;
+				} else if (maliceBehavior.getString().contains("读取用户短信息")) {
+					count[25] = count[25] + 1;
+				} else if (maliceBehavior.getString().contains("获取GPS现在的状态")) {
+					count[26] = count[26] + 1;
+				} else if (maliceBehavior.getString().contains("打开GPS")) {
+					count[27] = count[27] + 1;
+				} else if (maliceBehavior.getString().contains("获取root权限")) {
+					count[28] = count[28] + 1;
+				} else if (maliceBehavior.getString().contains("终止其他进程")) {
+					count[29] = count[29] + 1;
+				} else if (maliceBehavior.getString().contains("终止服务")) {
+					count[30] = count[30] + 1;
+				}
+			}
+			for (int i = 0; i < count.length; i++) {
+				result[i] = String.valueOf(count[i]);
+			}
+		} else {
+			for (int i = 0; i < result.length; i++) {
+				result[i] = String.valueOf(0);
+			}
 		}
 		return result;
 	}
-
 
 	// 获取安全规则
 	private List<SecureRule> getSecureRules() {
