@@ -187,8 +187,8 @@ public class TestSoot {
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory
 					.newInstance();
-			DocumentBuilder db = factory.newDocumentBuilder();
-			Document doc = db.parse(new File("secure_rules.xml"));
+	        DocumentBuilder db = factory.newDocumentBuilder();
+	        Document doc = db.parse(getClass().getResourceAsStream("/secure_rules.xml"));
 			Element elmtInfo = doc.getDocumentElement();
 			NodeList ruleNodeList = elmtInfo
 					.getElementsByTagName(SecureRule.SECURE_RULE);
@@ -236,8 +236,8 @@ public class TestSoot {
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory
 					.newInstance();
-			DocumentBuilder db = factory.newDocumentBuilder();
-			Document doc = db.parse(new File("white_list.xml"));
+	        DocumentBuilder db = factory.newDocumentBuilder();
+	        Document doc = db.parse(getClass().getResourceAsStream("/white_list.xml"));
 			Element elmtInfo = doc.getDocumentElement();
 			NodeList whiteNodeList = elmtInfo
 					.getElementsByTagName(WhitelistItem.WHITELIST_ITEM);
