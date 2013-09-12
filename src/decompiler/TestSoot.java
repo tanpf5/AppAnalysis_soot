@@ -91,6 +91,7 @@ public class TestSoot {
 							+ i);
 			checkDangerousBehavior();
 			i++;
+			if (i > 10) break;
 		}
 
 		// 输出分析结果
