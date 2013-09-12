@@ -47,6 +47,7 @@ public class TestSoot {
 
 
 	private List<Body> bodyList = new ArrayList<Body>();
+	
 
 	public String[] run() throws ReleaseException {
 
@@ -72,6 +73,7 @@ public class TestSoot {
 		if (!secureRules.isEmpty()) {
 			System.out
 					.println("**********************初次分析**************************");
+			soot.G.reset();
 			analysis();
 		}
 
@@ -262,7 +264,7 @@ public class TestSoot {
 
 	// 初次分析，记录所有风险行为
 	private void analysis() {
-
+	if (PackManager.v().getPack("jtp").get("jtp.myInstrumenter") == null)
 		PackManager.v().getPack("jtp")
 				.add(new Transform("jtp.myInstrumenter", new BodyTransformer() {
 					@Override

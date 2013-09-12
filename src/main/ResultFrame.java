@@ -745,7 +745,7 @@ public class ResultFrame extends JFrame implements ActionListener {
 		scrollPane.setBounds(0, 0, 600, 600);
 		jPanel.setPreferredSize(new Dimension(600, 1150));
 		add(new JScrollPane(scrollPane));
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}
 
